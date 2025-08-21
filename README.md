@@ -85,6 +85,8 @@ There are 2 ways to run this worker: using Docker or natively with `python3`.
 
 You can see container logs using `docker-compose logs -f` inside worker's folder. Also, `logs` folder is created where all `.log` files are saved if needed.
 
+To stop the worker, run `docker-compose down` inside worker's folder.
+
 ### Native Python
 1. Make sure you have Python 3.11+ installed on your machine. Head over to https://www.python.org/downloads/ in case you don't have it.
 2. Run `apt-get update && apt-get upgrade -y && apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev liblzma-dev`. This updates packages on your machine and installs necessary utilities for building all dependencies worker needs to function properly.
@@ -94,6 +96,8 @@ You can see container logs using `docker-compose logs -f` inside worker's folder
 6. Create and activate a virtual environment: `python3 -m venv venv && source venv/bin/activate`
 7. Install dependencies: `pip install -r requirements.txt`
 8. Run `python3 main.py` to start the worker.
+
+To stop the worker, press `Ctrl + C` inside of worker's terminal.
 
 If you want to get back to your main terminal, press `Ctrl + B`, then switfly press `D`. If you want to get back to the worker's terminal, use `tmux attach -t <session_name>`.
 
