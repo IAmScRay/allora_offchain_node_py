@@ -88,11 +88,12 @@ You can see container logs using `docker-compose logs -f` inside worker's folder
 ### Native Python
 1. Make sure you have Python 3.11+ installed on your machine. Head over to https://www.python.org/downloads/ in case you don't have it.
 2. Run `apt-get update && apt-get upgrade -y && apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev curl libbz2-dev liblzma-dev`. This updates packages on your machine and installs necessary utilities for building all dependencies worker needs to function properly.
-3. Make all appropriate changes to `config.json` & don't forget to save the file.
-4. We will run the worker in the background using `tmux`. Create a new `tmux` session like so: `tmux new -s <session_name>`
-5. Create and activate a virtual environment: `python3 -m venv venv && source venv/bin/activate`
-6. Install dependencies: `pip install -r requirements.txt`
-7. Run `python3 main.py` to start the worker.
+3. Clone this repo and go to its directory (if you have not already): `git clone https://github.com/IAmScRay/allora_offchain_node_py && cd allora_offchain_node_py`
+4. Make all appropriate changes to `config.json` & don't forget to save the file.
+5. We will run the worker in the background using `tmux`. Create a new `tmux` session like so: `tmux new -s <session_name>`
+6. Create and activate a virtual environment: `python3 -m venv venv && source venv/bin/activate`
+7. Install dependencies: `pip install -r requirements.txt`
+8. Run `python3 main.py` to start the worker.
 
 If you want to get back to your main terminal, press `Ctrl + B`, then switfly press `D`. If you want to get back to the worker's terminal, use `tmux attach -t <session_name>`.
 
