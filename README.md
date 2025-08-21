@@ -6,7 +6,7 @@
 ## What is this? 🧐
 This repo contains a Python implementation of an offchain worker node for Allora Network. There is an official Go implementation [here](https://github.com/allora-network/allora-offchain-node) that has a lot of customization and versatility, and it can run a reputer too, but after speaking with ML devs who want to run a model that contributes to the network, they have had tough times deploying and running worker nodes.
 
-Since this project consists of worker implenetation only, it has the easiest setup possible when you want to start contributing to the collective intelligence Allora is all about right away.
+Since this project consists of worker implementation only, it has the easiest setup possible when you want to start contributing to the collective intelligence Allora is all about right away.
 
 ## How do I configure this thing? 🤔
 There is `config.json` in this repo that is used for configuration. It looks like this:
