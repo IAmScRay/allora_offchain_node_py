@@ -1,0 +1,6 @@
+services:
+  allora_offchain_node_py:
+    build: .
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./logs:/app/logs
