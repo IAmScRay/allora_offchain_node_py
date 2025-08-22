@@ -1,8 +1,5 @@
 # Allora Offchain Node (Python implementation)
 
-![Allora Network](https://file.notion.so/f/f/0dc5c05b-a942-4b31-9e2d-f95694a1dc99/65fd3b56-057d-4ed9-b764-db433e858efb/allora-logo.jpg?table=block&id=3bf6d0ec-d4d0-4679-8a40-0a4cf4593dc0&spaceId=0dc5c05b-a942-4b31-9e2d-f95694a1dc99&expirationTimestamp=1755770400000&signature=Ch9XTe-HCQW-jbQ3cGNv2insW2f5MOAGHeRz-pfOIH4&downloadName=allora-logo.jpg)
-
-
 ## What is this? 🧐
 This repo contains a Python implementation of an offchain worker node for Allora Network. There is an official Go implementation [here](https://github.com/allora-network/allora-offchain-node) that has a lot of customization and versatility, and it can run a reputer too, but after speaking with ML devs who want to run a model that contributes to the network, they have had tough times deploying and running worker nodes.
 
