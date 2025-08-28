@@ -206,7 +206,7 @@ class APINode:
             wallet: "Wallet"
     ):
         """
-        Fetches and updates wallet's details.
+        Fetches and updates wallet's details (sequence, account number & balance).
 
         :param wallet: ``Wallet`` object
         """
@@ -241,8 +241,40 @@ class APINode:
 
         wallet.account_number = int(resp["info"]["account_number"])
         wallet.sequence = int(resp["info"]["sequence"])
+
+        try:
+            req = self.client.get(
+                url=f"/cosmos/bank/v1beta1/balances/{wallet.get_address()}/by_denom",
+                params={
+                    "denom": "uallo"
+                }
+            )
+        except httpx.RequestError as e:
+            self.params.get_logger().critical(f"httpx.RequestError: cannot fetch wallet balance ({e})")
+            return
+
+        if req.status_code in (403, 429, 500, 503):
+            self.params.get_logger().critical(f"Failed to fetch wallet balance: {req.status_code} HTTP response code")
+            return
+
+        try:
+            resp = req.json()
+        except JSONDecodeError:
+            self.params.get_logger().critical("JSONDecodeError: cannot extract wallet balance")
+            return
+
+        if "code" in resp:
+            self.params.get_logger().critical(f"Failed to fetch wallet balance: {resp['message']}")
+            return
+
+        if "balance" not in resp:
+            self.params.get_logger().critical(f"Failed to fetch wallet balance: `balance` field is not present")
+            return
+
+        wallet.balance = int(resp["balance"]["amount"])
+
         self.params.get_logger().debug(f"Wallet details fetched successfully! (account number: `{wallet.get_account_number()}`, "
-                          f"sequence: `{wallet.get_sequence()}`)")
+                          f"sequence: `{wallet.get_sequence()}`, balance: `{wallet.get_balance()}` uALLO)")
 
     def simulate_tx(
             self,
@@ -271,6 +303,14 @@ class APINode:
             resp = req.json()
         except JSONDecodeError:
             self.params.get_logger().critical("JSONDecodeError: cannot extract simulate result")
+            return -1
+
+        if "code" in resp:
+            if "insufficient funds" in resp["message"]:
+                self.params.get_logger().critical("Failed to simulate transaction: not enough balance")
+            else:
+                self.params.get_logger().critical(f"Failed to simulate transaction: `{resp['message']}`")
+
             return -1
 
         if "gas_info" not in resp:
