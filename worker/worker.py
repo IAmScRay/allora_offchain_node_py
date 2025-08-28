@@ -142,11 +142,17 @@ class Worker(Thread):
                         self.params.get_logger().info(f"Inference value for "
                                                       f"topic {self.params.get_topic_id()}: {inference_value}")
 
-                        self.wallet.submit_inference(
+                        proceed = self.wallet.submit_inference(
                             inference_value=inference_value,
                             topic_id=self.params.get_topic_id(),
                             inference_nonce=inference_nonce
                         )
+
+                        if not proceed:
+                            self.params.get_logger().critical("Not enough balance to operate – execution aborted")
+                            self.stop()
+
+                            continue
 
                         self.latest_used_nonce = inference_nonce
                 else:
