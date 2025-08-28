@@ -72,20 +72,28 @@ class Transaction:
             timeout_height=timeout_height
         )
 
+    def get_fee(self) -> int:
+        """
+        Gets current transaction fee in uALLO.
+        """
+        return int(self.fee.amount[0].amount)
+
     def set_fee(
             self,
             gas_limit: int,
-            gas_price: float
+            gas_price: float,
+            gas_adjustment: float
     ):
         """
         Sets a gas fee with an adjustment to the gas limit.
 
         :param gas_limit: estimated gas limit
         :param gas_price: price per unit of gas
+        :param gas_adjustment: adjustment multiplier
         """
         self.fee = tx_proto.Fee(
-            gas_limit=int(gas_limit * 1.5),
-            amount=[coin_proto.Coin(denom="uallo", amount=str(int(gas_limit * 1.5 * gas_price)))]
+            gas_limit=int(gas_limit * gas_adjustment),
+            amount=[coin_proto.Coin(denom="uallo", amount=str(int(gas_limit * gas_adjustment * gas_price)))]
         )
 
     def get_tx_bytes(self) -> str:
