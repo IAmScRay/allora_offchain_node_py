@@ -1,6 +1,7 @@
 {
   "debug": false,
   "seed_phrase": "",
+  "gas_adjustment": 1.5,
   "api_params": {
     "api_url": "",
     "tx_check_retries": 15,
@@ -10,7 +11,7 @@
     {
       "topic_id": 1,
       "inference_url": "http://localhost:8000/ETH",
-      "nonce_fetch_freq": 3,
+      "nonce_fetch_freq": 5,
       "inference_fetch_retries": 10,
       "inference_fetch_retry_freq": 3
     }
