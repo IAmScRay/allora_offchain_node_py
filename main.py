@@ -121,6 +121,7 @@ def main():
 
     wallet = Wallet(
         seed_phrase=CONFIG["seed_phrase"],
+        gas_adjustment=CONFIG["gas_adjustment"],
         api_node=wallet_api_node
     )
     if not wallet.is_initialized():
