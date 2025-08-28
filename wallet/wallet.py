@@ -38,14 +38,18 @@ class Wallet:
     pub_key_bytes: bytes
 
     address: str
-    account_number: int
-    sequence: int
+    account_number: int = -1
+    sequence: int = -1
+    balance: int = 0
+
+    gas_adjustment: float
 
     api_node: APINode
 
     def __init__(
             self,
             seed_phrase: str,
+            gas_adjustment: float,
             api_node: APINode
     ):
         seed_bytes = Mnemonic.to_seed(seed_phrase)
@@ -74,13 +78,12 @@ class Wallet:
 
         self.logger.info(f"Initializing worker wallet (address: `{self.address}`)")
 
-        self.account_number = -1
-        self.sequence = -1
+        self.gas_adjustment = gas_adjustment
 
         self.api_node = api_node
         self.api_node.fetch_wallet_details(self)
 
-        if self.account_number == -1 or self.sequence == -1:
+        if self.account_number == -1 or self.sequence == -1 or self.balance == 0:
             self.logger.critical("Failed to fetch wallet details")
             return
 
@@ -106,6 +109,12 @@ class Wallet:
         Increments wallet's sequence by **1** after transaction is executed.
         """
         self.sequence += 1
+
+    def get_balance(self) -> int:
+        """
+        Gets current balance of this wallet
+        """
+        return self.balance
 
     def get_address(self) -> str:
         """
@@ -191,10 +200,16 @@ class Wallet:
 
             tx.set_fee(
                 gas_limit=gas_limit,
-                gas_price=self.api_node.get_gas_price()
+                gas_price=self.api_node.get_gas_price(),
+                gas_adjustment=self.gas_adjustment
             )
 
-            self.logger.debug(f"Estimated fee: {int(gas_limit * 1.5 * self.api_node.get_gas_price()) / 10 ** 18} uALLO")
+            self.logger.debug(f"Estimated fee: {tx.get_fee()} uALLO")
+
+            if tx.get_fee() > self.balance:
+                self.logger.warning(f"Not enough balance to register for topic {topic_id}: "
+                                    f"required fee – {tx.get_fee()} uALLO, balance – {self.get_balance()} uALLO")
+                return False
 
             retries = 5
             tx_hash = ""
@@ -223,11 +238,13 @@ class Wallet:
             if message != "":
                 self.logger.critical(f"Failed to execute transaction {tx_hash}: {message}")
 
+                self.balance -= tx.get_fee()
                 self.increment_sequence()
                 return False
 
             self.logger.info(f"Registered wallet successfully! (topic {topic_id})")
 
+            self.balance -= tx.get_fee()
             self.increment_sequence()
             return True
 
@@ -236,7 +253,7 @@ class Wallet:
             inference_value: float,
             topic_id: int,
             inference_nonce: int
-    ):
+    ) -> bool:
         """
         Constructs and submits a ``InsertWorkerPayloadRequest`` transaction for a specified topic
         using provided inference value and inference (block height) nonce.
@@ -317,14 +334,20 @@ class Wallet:
             if gas_limit == -1:
                 self.logger.warning(f"Failed to broadcast `InsertWorkerPayloadRequest` transaction "
                                     f"for topic {topic_id}: cannot estimate gas limit")
-                return
+                return True
 
             tx.set_fee(
                 gas_limit=gas_limit,
-                gas_price=self.api_node.get_gas_price()
+                gas_price=self.api_node.get_gas_price(),
+                gas_adjustment=self.gas_adjustment
             )
 
-            self.logger.debug(f"Estimated fee: {int(gas_limit * 1.5 * self.api_node.get_gas_price()) / 10 ** 18} uALLO")
+            self.logger.debug(f"Estimated fee: {tx.get_fee()} uALLO")
+
+            if tx.get_fee() > self.balance:
+                self.logger.warning(f"Not enough balance to submit inference for topic {topic_id}: "
+                                    f"required fee – {tx.get_fee()} uALLO, balance – {self.get_balance()} uALLO")
+                return False
 
             retries = 5
             tx_hash = ""
@@ -345,7 +368,7 @@ class Wallet:
 
             if tx_hash == -1:
                 self.logger.warning(f"Failed to submit inference for topic {topic_id}: transaction cannot be broadcasted")
-                return
+                return True
 
             self.logger.info(f"Transaction broadcasted, hash: {tx_hash}")
 
@@ -355,4 +378,7 @@ class Wallet:
             else:
                 self.logger.info(f"Inference submitted successfully! (topic {topic_id})")
 
+            self.balance -= tx.get_fee()
             self.increment_sequence()
+
+            return True
