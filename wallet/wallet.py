@@ -216,7 +216,7 @@ class Wallet:
             while retries > 0 and tx_hash == "":
                 tx_hash = self.api_node.broadcast_tx(tx.get_tx_bytes())
 
-                if tx_hash == -1:
+                if tx_hash == "":
                     log_message = f"Could not broadcast transaction, retrying..."
                     if retries > 1 or retries == 0:
                         log_message += f" ({retries} retries left)"
@@ -228,7 +228,7 @@ class Wallet:
                     retries -= 1
                     time.sleep(3)
 
-            if tx_hash == -1:
+            if tx_hash == "":
                 self.logger.critical(f"Failed to register for topic {topic_id}: transaction cannot be broadcasted")
                 return False
 
@@ -354,7 +354,7 @@ class Wallet:
             while retries > 0 and tx_hash == "":
                 tx_hash = self.api_node.broadcast_tx(tx.get_tx_bytes())
 
-                if tx_hash == -1:
+                if tx_hash == "":
                     log_message = f"Could not broadcast transaction, retrying..."
                     if retries > 1 or retries == 0:
                         log_message += f" ({retries} retries left)"
@@ -366,7 +366,7 @@ class Wallet:
                     retries -= 1
                     time.sleep(3)
 
-            if tx_hash == -1:
+            if tx_hash == "":
                 self.logger.warning(f"Failed to submit inference for topic {topic_id}: transaction cannot be broadcasted")
                 return True
 
